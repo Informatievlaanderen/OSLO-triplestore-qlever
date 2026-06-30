@@ -1,0 +1,37 @@
+{
+    "name": "data-vlaanderen-scraper",
+    "version": "2.0.0",
+    "type": "module",
+    "scripts": {
+        "postinstall": "playwright install firefox",
+        "start": "node bin/cli.js",
+        "poststart": "sort -u output.nt | n3-transform -i turtle -p src/prefixes.json > output.ttl",
+        "lint:markdown": "markdownlint-cli2",
+        "lint:markdown:fix": "markdownlint-cli2 --fix",
+        "lint:js": "eslint .",
+        "lint:js:fix": "eslint . --fix",
+        "subsets": "npm run subset:classes-ap && npm run subset:predicates-ap",
+        "subset:classes-ap": "comunica-sparql-file output.ttl -f queries/get-all-used-classes.construct.rq | n3-transform -i turtle -p src/prefixes.json > classes-ap.ttl",
+        "subset:predicates-ap": "comunica-sparql-file output.ttl -f queries/get-all-used-predicates.construct.rq | n3-transform -i turtle -p src/prefixes.json > predicates-ap.ttl",
+        "validate": "mocha validation/*.js"
+    },
+    "dependencies": {
+        "@comunica/query-sparql-file": "^4.1.0",
+        "camelcase-keys": "^9.1.3",
+        "cheerio": "^1.0.0",
+        "fs-extra": "^11.3.0",
+        "jsonld-streaming-parser": "^5.0.0",
+        "n3": "^1.23.1",
+        "n3-transform": "^1.1.0",
+        "playwright": "^1.50.0",
+        "winston": "^3.17.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.17.0",
+        "eslint": "^9.17.0",
+        "eslint-plugin-jsdoc": "^50.6.1",
+        "globals": "^15.14.0",
+        "markdownlint-cli2": "^0.16.0",
+        "mocha": "^11.7.0"
+    }
+}

@@ -1,0 +1,22 @@
+ARG VERSION=latest
+FROM triple-store-base:${VERSION}
+
+WORKDIR /app
+ENV PYTHONPATH="/app"
+
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+RUN env >> /etc/environment && \
+    echo "*/8 * * * * root . /etc/environment && cd /app && (python main.py update && python main.py validate) >> /proc/1/fd/1 2>&1" > /etc/cron.d/triple-store-update && \
+    chmod 0644 /etc/cron.d/triple-store-update
+
+EXPOSE 8000 8888
+
+RUN chmod +x entrypoint.sh
+ENTRYPOINT ["./entrypoint.sh"]

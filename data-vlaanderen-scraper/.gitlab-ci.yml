@@ -1,0 +1,50 @@
+image: mcr.microsoft.com/playwright:v1.50.0-noble
+
+scrape:
+  stage: build
+  artifacts:
+    paths:
+      - output.ttl
+      - classes-ap.ttl
+      - predicates-ap.ttl
+  before_script:
+    - rm -rf ../data.vlaanderen.be2-generated
+    - git clone -b production --depth 1 https://github.com/Informatievlaanderen/data.vlaanderen.be2-generated ../data.vlaanderen.be2-generated
+    - npm i
+    - cp config-ci.json config.json
+  script:
+    - npm start
+    - npm run subsets
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "main"
+
+validate:
+  stage: test
+  before_script:
+    - npm i
+  script:
+    - npm run validate
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "main"
+
+deploy:
+  stage: deploy
+  before_script:
+    - git config --global user.email "pieter.heyvaert@ugent.be"
+    - git config --global user.name "Pieter Heyvaert"
+  script:
+    - cd ..
+    - rm -rf data-vlaanderen-bundled-rdf
+    - git clone https://$GITHUB_TOKEN@github.com/KNowledgeOnWebScale/data-vlaanderen-bundled-rdf.git
+    - cd data-vlaanderen-bundled-rdf
+    - cp ../data-vlaanderen-scraper/output.ttl bundle.ttl
+    - cp ../data-vlaanderen-scraper/classes-ap.ttl classes-ap.ttl
+    - cp ../data-vlaanderen-scraper/predicates-ap.ttl predicates-ap.ttl
+    - git add .
+    - if ! git commit -m "Run of $(date +"%Y-%m-%dT%H:%M:%S%z")"; then
+        echo "Nothing to commit.";
+      else
+        git push ;
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "main"

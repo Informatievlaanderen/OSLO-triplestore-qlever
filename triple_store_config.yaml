@@ -1,0 +1,51 @@
+repository:
+  # Repository URL and branch acting as source of data
+  url: "https://github.com/Informatievlaanderen/data.vlaanderen.be2-generated"
+  branch: "production"
+  # What directory the repository will be cloned to
+  dir_name: "data.vlaanderen.be2-generated"
+
+scraper:
+  # The directory the scraper code lives in
+  scraper_dir: "data-vlaanderen-scraper"
+  # The directory the scraper output is put in
+  scraper_output_dir: "data-vlaanderen-scraper-output"
+
+qlever:
+  # Directory QLever instance 'lives' in
+  store_dir: "qlever"
+  # Directory where previous indexes are stored
+  previous_indexes_dir: "previous_qlever_indexes"
+  # Name of .nt file containing initial data
+  dataset_name: "data-vlaanderen"
+  # Port the endpoint will listen on
+  port: 8888
+  # Token to do update queries to endpoint
+  access_token: FpAh9pq1Q7Xe
+
+files:
+  # Raw output of scraper over repository
+  unsorted: "output.nt"
+  # Filename of sorted scraper output
+  sorted: "output.unique.nt"
+  # Filename of sorted scraper output of previous scraping run
+  # mainly used to determine the diff between runs and update the
+  # endpoint accordingly
+  previous: "output.previous.nt"
+  # Diff files between most recent and previous scrape run
+  additions: "additions.nt"
+  deletions: "deletions.nt"
+  # Directory where logs of scrape runs are saved to
+  logs: "logs"
+
+server:
+  # Token to allow HTTP requests to call the update function
+  access_token: FpAh9pq1Q7Xe
+
+validation:
+  # Location of validation queries
+  queries_dir: "./validation_data/validation_queries"
+  # File where the validation output is logged
+  log_file: "./validation_data/validation_history.csv"
+  # File where the plot derived from validation csv is put
+  plot_file: "./validation_data/performance_evolution.pdf"

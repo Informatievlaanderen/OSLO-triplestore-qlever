@@ -1,0 +1,10 @@
+PREFIX ql: <http://qlever.cs.uni-freiburg.de/builtin-functions/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX shacl: <http://www.w3.org/ns/shacl#>
+
+SELECT DISTINCT ?shape WHERE {
+  ?textSnippet ql:contains-word "adres*" .
+  ?textSnippet ql:contains-entity ?shape .
+}
+GROUP BY ?shape
+LIMIT 100

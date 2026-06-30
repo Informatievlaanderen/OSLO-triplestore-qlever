@@ -1,0 +1,9 @@
+auto_mix_prep==0.2.0
+fastapi==0.138.0
+matplotlib==3.11.0
+omegaconf==2.3.1
+pandas==3.0.3
+rdflib==7.6.0
+Requests==2.34.2
+qlever==0.5.48
+uvicorn==0.49.0
