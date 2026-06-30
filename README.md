@@ -93,8 +93,6 @@ This command builds the Docker image and runs the container with the volumes spe
 
 > **Note:** Running the Docker image requires the `qlever` directory to be completely free of existing indexes. The Dockerfile initializes the environment from scratch and will not overwrite existing indexes.
 
-*TODO: Separate the Dockerfiles for Node.js and Qlever into `.base` and `.build` stages.*
-
 **Important:** Currently, the cronjob is scheduled to run every 8 minutes. This should be adjusted to a more appropriate interval for production.
 
 ## Considerations
