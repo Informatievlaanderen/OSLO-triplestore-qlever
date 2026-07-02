@@ -1,17 +1,23 @@
 -include .env
 
-# Hardcoded variables
-VERSION := latest
-PUBLISHEDIMAGE := informatievlaanderen/triple-store
-BASE_IMAGE := triple-store-base
-APP_IMAGE := triple-store-informatievlaanderen
+VERSION := $(shell cat VERSION)
+PUBLISHEDIMAGE := $(shell cat PUBLISHED)
+BASE_IMAGE := qlever-triple-store-base
+APP_IMAGE := qlever-triple-store
 
 build-base:
 	docker build -f Dockerfile.base -t $(BASE_IMAGE):$(VERSION) .
 
+build-base-linux:
+	docker build -f Dockerfile.base --build-arg --platform=linux/amd64  -t $(BASE_IMAGE):$(VERSION) .
+
 # Requires build-base to be run first
 build:
 	docker build -f Dockerfile.build --build-arg "VERSION=$(VERSION)" -t $(APP_IMAGE):$(VERSION) .
+
+# Requires build-base-linux to be run first
+build-linux:
+	docker build -f Dockerfile.build --build-arg "VERSION=$(VERSION)" --build-arg --platform=linux/amd64  -t $(APP_IMAGE):$(VERSION) .
 
 # Runs the container exactly like your docker-compose file did
 run:
@@ -27,3 +33,7 @@ run:
 
 stop:
 	docker stop $(APP_IMAGE)
+
+publish:
+	docker tag informatievlaanderen/${APP_IMAGE}:${VERSION} ${PUBLISHEDIMAGE}:${VERSION}
+	docker push ${PUBLISHEDIMAGE}:${VERSION}
