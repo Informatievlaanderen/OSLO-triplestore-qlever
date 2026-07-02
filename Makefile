@@ -9,7 +9,7 @@ build-base:
 	docker build -f Dockerfile.base -t $(BASE_IMAGE):$(VERSION) .
 
 build-base-linux:
-	docker build -f Dockerfile.base --build-arg --platform=linux/amd64  -t $(BASE_IMAGE):$(VERSION) .
+	docker build --platform=linux/amd64 -f Dockerfile.base -t $(BASE_IMAGE):$(VERSION) .
 
 # Requires build-base to be run first
 build:
@@ -17,9 +17,8 @@ build:
 
 # Requires build-base-linux to be run first
 build-linux:
-	docker build -f Dockerfile.build --build-arg "VERSION=$(VERSION)" --build-arg --platform=linux/amd64  -t $(APP_IMAGE):$(VERSION) .
+	docker build --platform=linux/amd64 -f Dockerfile.build --build-arg "VERSION=$(VERSION)" -t $(APP_IMAGE):$(VERSION) .
 
-# Runs the container exactly like your docker-compose file did
 run:
 	docker run -d --name $(APP_IMAGE) \
 		--restart unless-stopped \
@@ -35,5 +34,5 @@ stop:
 	docker stop $(APP_IMAGE)
 
 publish:
-	docker tag informatievlaanderen/${APP_IMAGE}:${VERSION} ${PUBLISHEDIMAGE}:${VERSION}
+	docker tag ${APP_IMAGE}:${VERSION} ${PUBLISHEDIMAGE}:${VERSION}
 	docker push ${PUBLISHEDIMAGE}:${VERSION}
