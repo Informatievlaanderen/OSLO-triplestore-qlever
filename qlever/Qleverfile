@@ -34,7 +34,7 @@ TEXT_INDEX = from_literals
 
 [server]
 # Required for local testing of rebuild-index
-HOST_NAME    = localhost
+HOST_NAME    = 0.0.0.0
 PORT         = 8888
 # IMPORTANT:
 # This should be changed for official use as this has been in a public repo!!

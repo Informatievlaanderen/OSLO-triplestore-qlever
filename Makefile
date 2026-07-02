@@ -24,3 +24,6 @@ run:
 		-v $(PWD)/data-vlaanderen-scraper-output:/app/data-vlaanderen-scraper-output \
 		-e TZ=Europe/Brussels \
 		$(APP_IMAGE):$(VERSION)
+
+stop:
+	docker stop $(APP_IMAGE)
