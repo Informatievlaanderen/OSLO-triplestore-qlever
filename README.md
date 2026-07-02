@@ -45,7 +45,7 @@ python main.py update
 
 This command executes the following sequence:
 1. Runs the scraper over the repository specified in `triple_store_config.yaml`.
-2. Calculates the differences between the newly obtained data (default: `data-vlaanderen-scraper-output/output.unique.nt`) and the previously obtained data. When the update command runs the previously obtained data is stored in `data-vlaanderen-scraper-output/output.unique.nt`), only after the update command is finished it is moved to a `previous` location (default: `data-vlaanderen-scraper-output/output.previous.nt`).
+2. Calculates the differences between the newly obtained data (default: `data-vlaanderen-scraper-output/output.unique.nt`) and the previously obtained data. When the update command runs the previously obtained data is stored in `data-vlaanderen-scraper-output/output.unique.nt`, only after the update command is finished it is moved to a `previous` location (default: `data-vlaanderen-scraper-output/output.previous.nt`).
 3. Creates `additions.nt` and `deletions.nt` and logs them in the logging directory (default: `logs`).
 4. If there are any additions or deletions, sends them as update queries to Qlever and executes a `rebuild-index` command to integrate the changes into the main index.
 
@@ -77,23 +77,34 @@ The validation output is appended to `validation_data/validation_history.csv` an
 
 This process includes a simple text-search query that finds 100 literals starting with 'adres'.
 
-## Docker Container
+## Docker Deployment
 
-This repository can be set up as a Docker container. Run the following command:
+This repository includes a multi-stage Docker setup to containerize the endpoint and automate updates via cron.
+
+### Deployment Steps
+
+Build the base image (installs system requirements including Python, Node.js, and Playwright dependencies):
 
 ```bash
-docker compose up --build -d 
+make build-base
 ```
 
-This command builds the Docker image and runs the container with the volumes specified in the compose file. The build process follows these steps:
-1. Sets up the base environment and installs system requirements. The primary dependencies are Python, Node.js, and Playwright.
-2. Sets up the Python virtual environment and installs the required packages.
-3. Configures a cronjob to run the `update` and `validate` commands sequentially.
-4. Starts the endpoint using the `entrypoint.sh` script, which initializes Qlever and starts the FastAPI server.
+Build the runtime image (sets up the virtual environment, configures the FastAPI server, and registers the cronjob):
+
+```bash
+make build
+```
+
+Run the container with the required volumes:
+
+```bash
+make run
+```
 
 > **Note:** Running the Docker image requires the `qlever` directory to be completely free of existing indexes. The Dockerfile initializes the environment from scratch and will not overwrite existing indexes.
 
-**Important:** Currently, the cronjob is scheduled to run every 8 minutes. This should be adjusted to a more appropriate interval for production.
+**Important:** Currently, the cronjob is scheduled to run every 8 minutes. This should be adjusted to a more appropriate interval for production in
+`Dockerfile.build`.
 
 ## Considerations
 
