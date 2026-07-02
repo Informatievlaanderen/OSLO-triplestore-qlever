@@ -14,9 +14,9 @@ To start the endpoint from a clean slate and obtain all current data, run:
 python main.py init
 ```
 
-By default, this command deletes any existing data in the `qlever/data_bak` and `qlever/data_raw` directories, and moves any existing data in the `qlever/data` directory to `qlever/data_bak`. Furthermore, the initialization will fail if any indexes are already present.
+By default, this command deletes any existing data in the `qlever/data_bak` and `qlever/data_raw` directories, and moves any existing data in the `qlever/data` directory to `qlever/data_bak`. 
 
-To overwrite existing indexes, use the `--overwrite-indexes` option. **Warning:** This is a destructive operation! Existing indexes may contain the results of update queries issued to the endpoint that are not stored in the `.nt` file in `qlever/data`.
+This command will download and scrape the latest data in `data.vlaanderen.be2-generated` and overwrite existing indexes (in `qlever/data_vlaanderen_endpoint.*`) with this data.  **Warning:** This is a destructive operation! Existing indexes may contain the results of update queries issued to the endpoint that are not stored in the `.nt` file in `qlever/data`.
 
 To reinitialize an already running endpoint, you must first stop it:
 

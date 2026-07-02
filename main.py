@@ -32,11 +32,6 @@ def main():
         "init",
         help="Start the endpoint from a clean slate and obtain all current data.",
     )
-    parser_init.add_argument(
-        "--overwrite-indexes",
-        action="store_true",
-        help="Overwrite existing QLever indexes during initialization.",
-    )
 
     parser_restart = subparsers.add_parser(
         "restart", help="Restart the endpoint from a previous state."
@@ -56,7 +51,7 @@ def main():
     config = load_config(args.config)
 
     if args.command == "init":
-        initialize_qlever_endpoint(config, overwrite_indexes=args.overwrite_indexes)
+        initialize_qlever_endpoint(config)
     elif args.command == "restart":
         restart_qlever_endpoint(config)
     elif args.command == "update":

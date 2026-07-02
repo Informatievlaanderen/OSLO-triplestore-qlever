@@ -23,7 +23,7 @@ def setup_logger(log_dir: Path):
     )
 
 
-def initialize_qlever_endpoint(config, overwrite_indexes: bool) -> None:
+def initialize_qlever_endpoint(config) -> None:
     cwd = Path.cwd()
     date_str = datetime.now().date().isoformat()
 
@@ -73,9 +73,7 @@ def initialize_qlever_endpoint(config, overwrite_indexes: bool) -> None:
         raise FileNotFoundError("Data cleaning failed to produce the expected output file.")
 
     # Build indexes and start server
-    index_cmd = "qlever --qleverfile Qleverfile index"
-    if overwrite_indexes:
-        index_cmd += " --overwrite-existing"
+    index_cmd = "qlever --qleverfile Qleverfile index --overwrite-existing"
 
     logging.info("Building QLever indexes.")
     run_command(index_cmd, cwd=qlever_dir)
