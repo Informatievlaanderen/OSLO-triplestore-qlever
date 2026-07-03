@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 RUN env >> /etc/environment && \
-    echo "*/8 * * * * root . /etc/environment && cd /app && (python main.py update && python main.py validate) >> /proc/1/fd/1 2>&1" > /etc/cron.d/triple-store-update && \
+    echo "0 */2 * * * root . /etc/environment && cd /app && (python main.py update && python main.py validate) >> /proc/1/fd/1 2>&1" > /etc/cron.d/triple-store-update && \
     chmod 0644 /etc/cron.d/triple-store-update
 
 EXPOSE 8000 8888
