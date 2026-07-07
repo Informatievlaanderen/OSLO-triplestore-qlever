@@ -3,9 +3,14 @@ From project root:
 source .venv/bin/activate
 pip install qlever
 ```
+Render local QLever config from template using your token in `.env`:
+```bash
+python scripts/render_qleverfile.py --env-file .env
+```
+
 Then navigate to qlever directory
 ```bash
-cd triples_stores/qlever
+cd qlever
 ```
 
 if a Qleverfile doesn't exist yet:
@@ -14,16 +19,16 @@ qlever setup-config default
 ```
 Index data:
 ```bash
-qlever --qleverfile Qleverfile index
+qlever --qleverfile Qleverfile.local index
 ```
 Starts dockerfile running QLever:
 ```bash
-qlever --qleverfile Qleverfile start
+qlever --qleverfile Qleverfile.local start
 ```
 
 Rebuilds index when updates happen:
 ```bash
-qlever --qleverfile Qleverfile rebuild-index 
+qlever --qleverfile Qleverfile.local rebuild-index 
 ```
 
 ## Considerations

@@ -6,6 +6,31 @@ Code repository for starting, automatically updating, and maintaining the Qlever
 
 Below is a list of available commands to manage the endpoint.
 
+### Token Setup and Qleverfile Rendering
+
+QLever does not support `${...}` environment interpolation inside `Qleverfile` itself.
+This repository uses a reusable render script that generates `qlever/Qleverfile.local`
+from `qlever/Qleverfile.template`.
+
+1. Create a local env file from the example:
+
+```bash
+cp .env.example .env
+```
+
+2. Set `QLEVER_ACCESS_TOKEN` in `.env`.
+
+3. Render the local QLever config:
+
+```bash
+python scripts/render_qleverfile.py --env-file .env
+```
+
+The pipeline commands (`init` and `restart`) also render `qlever/Qleverfile.local`
+automatically from the token configured in `triple_store_config.yaml`.
+Python entrypoints in this repository load `.env` automatically when present, so
+manual `source .env` is not required for `main.py` and `core.api`.
+
 ### Initialize the Endpoint
 
 To start the endpoint from a clean slate and obtain all current data, run:
@@ -54,7 +79,7 @@ If the endpoint fails to start after rebuilding the index, the script rolls back
 This command can also be triggered via HTTP. Start the server using:
 
 ```bash
-uvicorn src.api:app --host 0.0.0.0 --port 8000
+uvicorn core.api:app --host 0.0.0.0 --port 8000
 ```
 
 Then, issue the command via an HTTP POST request:

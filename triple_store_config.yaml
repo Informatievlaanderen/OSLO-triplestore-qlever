@@ -21,7 +21,7 @@ qlever:
   # Port the endpoint will listen on
   port: 8888
   # Token to do update queries to endpoint
-  access_token: FpAh9pq1Q7Xe
+  access_token: ${oc.env:QLEVER_ACCESS_TOKEN}
 
 files:
   # Raw output of scraper over repository
@@ -40,7 +40,7 @@ files:
 
 server:
   # Token to allow HTTP requests to call the update function
-  access_token: FpAh9pq1Q7Xe
+  access_token: ${oc.env:QLEVER_ACCESS_TOKEN}
 
 validation:
   # Location of validation queries

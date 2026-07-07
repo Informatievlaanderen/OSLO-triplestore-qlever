@@ -1,10 +1,55 @@
 import shutil
 import logging
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
 from core.clean_data import clean_data
 from core.utils import scrape_data, run_command
+
+
+def prepare_local_qleverfile(config, qlever_dir: Path) -> Path:
+    """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
+    source_template = qlever_dir / "Qleverfile.template"
+    source_qleverfile = qlever_dir / "Qleverfile"
+    target = qlever_dir / "Qleverfile.local"
+
+    source = source_template if source_template.exists() else source_qleverfile
+    if not source.exists():
+        raise FileNotFoundError(
+            f"Neither {source_template} nor {source_qleverfile} exists. "
+            "At least one source Qleverfile is required."
+        )
+
+    token = str(config.qlever.access_token)
+    if not token or token.startswith("${"):
+        raise ValueError(
+            "qlever.access_token is not resolved. Load your environment (for example from .env) before running commands."
+        )
+
+    project_root = Path(__file__).resolve().parents[1]
+    render_script = project_root / "scripts" / "render_qleverfile.py"
+    if not render_script.exists():
+        raise FileNotFoundError(f"Render script not found at {render_script}")
+
+    cmd = [
+        sys.executable,
+        str(render_script),
+        "--template",
+        str(source),
+        "--output",
+        str(target),
+        "--token",
+        token,
+    ]
+    try:
+        subprocess.run(cmd, cwd=project_root, check=True)
+    except subprocess.CalledProcessError as e:
+        logging.error("Failed to render local Qleverfile from template.")
+        raise RuntimeError("Unable to generate Qleverfile.local") from e
+
+    return target
 
 
 def setup_logger(log_dir: Path):
@@ -73,13 +118,14 @@ def initialize_qlever_endpoint(config) -> None:
         raise FileNotFoundError("Data cleaning failed to produce the expected output file.")
 
     # Build indexes and start server
-    index_cmd = "qlever --qleverfile Qleverfile index --overwrite-existing"
+    qleverfile_local = prepare_local_qleverfile(config, qlever_dir)
+    index_cmd = f"qlever --qleverfile {qleverfile_local.name} index --overwrite-existing"
 
     logging.info("Building QLever indexes.")
     run_command(index_cmd, cwd=qlever_dir)
 
     logging.info("Starting QLever endpoint.")
-    run_command("qlever --qleverfile Qleverfile start", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local.name} start", cwd=qlever_dir)
 
 def restart_qlever_endpoint(config):
     cwd = Path.cwd()
@@ -90,12 +136,13 @@ def restart_qlever_endpoint(config):
     logging.info("Restarting QLever endpoint.")
 
     qlever_dir = cwd / config.qlever.store_dir
+    qleverfile_local = prepare_local_qleverfile(config, qlever_dir)
 
     if not qlever_dir.exists():
         logging.error("QLever directory missing. Initialization required.")
         raise FileNotFoundError("QLever directory does not exist. Run initialization first.")
 
-    run_command("qlever --qleverfile Qleverfile stop", cwd=qlever_dir)
-    run_command("qlever --qleverfile Qleverfile start", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local.name} stop", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local.name} start", cwd=qlever_dir)
     logging.info("QLever endpoint restarted successfully.")
 

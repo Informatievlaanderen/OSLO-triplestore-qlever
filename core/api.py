@@ -5,6 +5,7 @@ from fastapi import FastAPI, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from omegaconf import OmegaConf
 
+from core.env_loader import load_dotenv_if_present
 from core.update_pipeline import execute_update_pipeline
 
 # Initialize application and security schema
@@ -13,6 +14,7 @@ security = HTTPBearer()
 
 
 def load_config():
+    load_dotenv_if_present()
     config_path = Path("triple_store_config.yaml")
     if not config_path.exists():
         raise FileNotFoundError(f"Configuration file not found at {config_path}")

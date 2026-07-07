@@ -192,6 +192,10 @@ qlever/**
 # Un-ignore the specific root files
 !qlever/README.md
 !qlever/Qleverfile
+!qlever/Qleverfile.template
+
+# Keep generated runtime-specific qlever config local-only
+qlever/Qleverfile.local
 
 # Un-ignore .keep files at any nested level
 !qlever/**/*.keep

@@ -2,12 +2,14 @@ import argparse
 from pathlib import Path
 from omegaconf import OmegaConf
 
+from core.env_loader import load_dotenv_if_present
 from core.setup_triple_store import initialize_qlever_endpoint, restart_qlever_endpoint
 from core.update_pipeline import execute_update_pipeline
 from core.validate import validate_endpoint
 
 
 def load_config(config_path: Path):
+    load_dotenv_if_present()
     if not config_path.exists():
         raise FileNotFoundError(
             f"{config_path} not found. Please ensure the file exists at the specified path."
