@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Keep a template copy outside /app/qlever so bind mounts cannot shadow it.
+RUN mkdir -p /app/templates && cp /app/qlever/Qleverfile.template /app/templates/Qleverfile.template
+
 RUN env >> /etc/environment && \
     echo "0 */2 * * * root . /etc/environment && cd /app && (python main.py update && python main.py validate) >> /proc/1/fd/1 2>&1" > /etc/cron.d/triple-store-update && \
     chmod 0644 /etc/cron.d/triple-store-update

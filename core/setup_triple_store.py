@@ -11,15 +11,24 @@ from core.utils import scrape_data, run_command
 
 def prepare_local_qleverfile(config, qlever_dir: Path) -> Path:
     """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
-    source_template = qlever_dir / "Qleverfile.template"
-    source_qleverfile = qlever_dir / "Qleverfile"
     project_root = Path(__file__).resolve().parents[1]
+    source_template = qlever_dir / "Qleverfile.template"
+    fallback_template = project_root / "templates" / "Qleverfile.template"
+    source_qleverfile = qlever_dir / "Qleverfile"
     target = project_root / "Qleverfile.local"
 
-    source = source_template if source_template.exists() else source_qleverfile
-    if not source.exists():
+    if source_template.exists():
+        source = source_template
+    elif source_qleverfile.exists():
+        source = source_qleverfile
+    elif fallback_template.exists():
+        source = fallback_template
+    else:
+        source = None
+
+    if source is None:
         raise FileNotFoundError(
-            f"Neither {source_template} nor {source_qleverfile} exists. "
+            f"Neither {source_template} nor {source_qleverfile} nor {fallback_template} exists. "
             "At least one source Qleverfile is required."
         )
 
