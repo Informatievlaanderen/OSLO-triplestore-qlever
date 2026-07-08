@@ -196,6 +196,8 @@ qlever/**
 
 # Keep generated runtime-specific qlever config local-only
 qlever/Qleverfile.local
+Qleverfile.local
+data.vlaanderen.be2-generated
 
 # Un-ignore .keep files at any nested level
 !qlever/**/*.keep

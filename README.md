@@ -9,7 +9,7 @@ Below is a list of available commands to manage the endpoint.
 ### Token Setup and Qleverfile Rendering
 
 QLever does not support `${...}` environment interpolation inside `Qleverfile` itself.
-This repository uses a reusable render script that generates `qlever/Qleverfile.local`
+This repository uses a reusable render script that generates `Qleverfile.local`
 from `qlever/Qleverfile.template`.
 
 1. Create a local env file from the example:
@@ -26,7 +26,7 @@ cp .env.example .env
 python scripts/render_qleverfile.py --env-file .env
 ```
 
-The pipeline commands (`init` and `restart`) also render `qlever/Qleverfile.local`
+The pipeline commands (`init` and `restart`) also render `Qleverfile.local`
 automatically from the token configured in `triple_store_config.yaml`.
 Python entrypoints in this repository load `.env` automatically when present, so
 manual `source .env` is not required for `main.py` and `core.api`.

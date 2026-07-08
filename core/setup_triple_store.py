@@ -13,7 +13,8 @@ def prepare_local_qleverfile(config, qlever_dir: Path) -> Path:
     """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
     source_template = qlever_dir / "Qleverfile.template"
     source_qleverfile = qlever_dir / "Qleverfile"
-    target = qlever_dir / "Qleverfile.local"
+    project_root = Path(__file__).resolve().parents[1]
+    target = project_root / "Qleverfile.local"
 
     source = source_template if source_template.exists() else source_qleverfile
     if not source.exists():
@@ -28,7 +29,6 @@ def prepare_local_qleverfile(config, qlever_dir: Path) -> Path:
             "qlever.access_token is not resolved. Load your environment (for example from .env) before running commands."
         )
 
-    project_root = Path(__file__).resolve().parents[1]
     render_script = project_root / "scripts" / "render_qleverfile.py"
     if not render_script.exists():
         raise FileNotFoundError(f"Render script not found at {render_script}")
@@ -119,13 +119,13 @@ def initialize_qlever_endpoint(config) -> None:
 
     # Build indexes and start server
     qleverfile_local = prepare_local_qleverfile(config, qlever_dir)
-    index_cmd = f"qlever --qleverfile {qleverfile_local.name} index --overwrite-existing"
+    index_cmd = f"qlever --qleverfile {qleverfile_local} index --overwrite-existing"
 
     logging.info("Building QLever indexes.")
     run_command(index_cmd, cwd=qlever_dir)
 
     logging.info("Starting QLever endpoint.")
-    run_command(f"qlever --qleverfile {qleverfile_local.name} start", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local} start", cwd=qlever_dir)
 
 def restart_qlever_endpoint(config):
     cwd = Path.cwd()
@@ -142,7 +142,7 @@ def restart_qlever_endpoint(config):
         logging.error("QLever directory missing. Initialization required.")
         raise FileNotFoundError("QLever directory does not exist. Run initialization first.")
 
-    run_command(f"qlever --qleverfile {qleverfile_local.name} stop", cwd=qlever_dir)
-    run_command(f"qlever --qleverfile {qleverfile_local.name} start", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local} stop", cwd=qlever_dir)
+    run_command(f"qlever --qleverfile {qleverfile_local} start", cwd=qlever_dir)
     logging.info("QLever endpoint restarted successfully.")
 
