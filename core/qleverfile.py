@@ -6,7 +6,14 @@ import sys
 from pathlib import Path
 
 
-def prepare_local_qleverfile(config, qlever_dir: Path, data_dir: Path | None = None) -> Path:
+def prepare_local_qleverfile(
+    config,
+    qlever_dir: Path,
+    data_dir: Path | None = None,
+    base_dir: Path | None = None,
+    rdf_format: str = "nt",
+    input_glob: str = "data/*.nt",
+) -> Path:
     """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
     project_root = Path(__file__).resolve().parents[1]
     source_template = qlever_dir / "Qleverfile.template"
@@ -48,9 +55,15 @@ def prepare_local_qleverfile(config, qlever_dir: Path, data_dir: Path | None = N
         str(target),
         "--token",
         token,
+        "--format",
+        rdf_format,
+        "--input-glob",
+        input_glob,
     ]
     if data_dir is not None:
         cmd.extend(["--data-dir", str(data_dir)])
+    if base_dir is not None:
+        cmd.extend(["--base-dir", str(base_dir)])
     try:
         subprocess.run(cmd, cwd=project_root, check=True)
     except subprocess.CalledProcessError as e:

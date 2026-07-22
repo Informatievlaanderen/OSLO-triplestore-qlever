@@ -5,18 +5,8 @@ from pathlib import Path
 
 from core.clean_data import clean_data
 from core.logger import setup_logger
-from core.nq_merge import convert_nq_dumps_to_individual_nt
 from core.qleverfile import prepare_local_qleverfile
 from core.utils import scrape_data, run_command
-
-
-def _merge_nq_dumps_into_dataset(active_data_dir: Path, active_file: Path, single: bool = False) -> None:
-    """Backward-compatible wrapper — delegates to convert_nq_dumps_to_individual_nt.
-
-    The ``active_file`` argument is ignored; each .nq dump now becomes its own
-    .nt file instead of being merged into a single file.
-    """
-    convert_nq_dumps_to_individual_nt(active_data_dir, single=single)
 
 
 def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bool = False) -> None:
@@ -30,6 +20,7 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
     # Define streamlined paths
     qlever_dir = cwd / config.qlever.store_dir
     active_data_dir = qlever_dir / "data"
+    dumps_dir = active_data_dir / "dumps"
     archive_dir = qlever_dir / "archive"
     output_dir = cwd / config.scraper.scraper_output_dir
 
@@ -41,13 +32,13 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
     archive_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Archive the previous active dataset (overwrites existing file)
-    if active_file.exists():
-        logging.info("Archiving previous active data.")
-        archived_active = archive_dir / f"{dataset_name}.previous.nt"
-        shutil.move(str(active_file), str(archived_active))
-
     if not with_dumps:
+        # Archive the previous active dataset (overwrites existing file)
+        if active_file.exists():
+            logging.info("Archiving previous active data.")
+            archived_active = archive_dir / f"{dataset_name}.previous.nt"
+            shutil.move(str(active_file), str(archived_active))
+
         # Scrape new data
         raw_scraped_file = scrape_data(config, output_dir)
 
@@ -68,16 +59,34 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
             shutil.move(str(cleaned_output), str(active_file))
         else:
             raise FileNotFoundError("Data cleaning failed to produce the expected output file.")
-    else:
-        logging.info("--with-dumps: skipping scraper, using N-Quads dump files only.")
 
-    # Optionally convert all N-Quads dump files into individual .nt files
-    if with_dumps:
-        convert_nq_dumps_to_individual_nt(active_data_dir, single=single_dump)
+        # Scraper produces .nt files in data/
+        qlever_data_dir = active_data_dir
+        rdf_format = "nt"
+        input_glob = "data/*.nt"
+    else:
+        logging.info("--with-dumps: skipping scraper, using N-Quads dump files directly.")
+
+        if single_dump:
+            nq_files = sorted(dumps_dir.glob("*.nq"))
+            if nq_files:
+                logging.info(f"--single-dump: using only {nq_files[0].name}")
+            else:
+                logging.warning("--single-dump: no .nq files found in dumps directory.")
+
+        # Point QLever directly at the .nq dump files — no conversion needed.
+        # QLever natively supports N-Quads (.nq) format.
+        qlever_data_dir = dumps_dir
+        rdf_format = "nq"
+        input_glob = "data/dumps/*.nq"
 
     # Build indexes and start server
-    qleverfile_local = prepare_local_qleverfile(config, qlever_dir, active_data_dir)
-    index_cmd = f"qlever --qleverfile {qleverfile_local} index --overwrite-existing"
+    qleverfile_local = prepare_local_qleverfile(
+        config, qlever_dir, qlever_data_dir,
+        base_dir=qlever_dir,
+        rdf_format=rdf_format, input_glob=input_glob,
+    )
+    index_cmd = f"qlever --qleverfile {qleverfile_local} index --overwrite-existing --parser-buffer-size=100MB"
 
     logging.info("Building QLever indexes.")
     run_command(index_cmd, cwd=qlever_dir)

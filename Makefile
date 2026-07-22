@@ -45,7 +45,7 @@ run-dumps:
 		$(APP_IMAGE):$(VERSION)
 
 stop:
-	docker stop $(APP_IMAGE)
+	docker stop $(APP_IMAGE) && docker rm $(APP_IMAGE)
 
 publish:
 	docker tag ${APP_IMAGE}:${VERSION} ${PUBLISHEDIMAGE}:${VERSION}
