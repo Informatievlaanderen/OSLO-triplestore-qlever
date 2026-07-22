@@ -35,6 +35,20 @@ def main():
         help="Start the endpoint from a clean slate and obtain all current data.",
     )
 
+    parser_init.add_argument(
+        "--with-dumps",
+        action="store_true",
+        default=False,
+        help="Also include all quads from qlever/data/dumps/*.nq files during initialization.",
+    )
+
+    parser_init.add_argument(
+        "--single-dump",
+        action="store_true",
+        default=False,
+        help="When used with --with-dumps, only convert the first .nq file (useful for testing).",
+    )
+
     parser_restart = subparsers.add_parser(
         "restart", help="Restart the endpoint from a previous state."
     )
@@ -53,7 +67,7 @@ def main():
     config = load_config(args.config)
 
     if args.command == "init":
-        initialize_qlever_endpoint(config)
+        initialize_qlever_endpoint(config, with_dumps=args.with_dumps, single_dump=args.single_dump)
     elif args.command == "restart":
         restart_qlever_endpoint(config)
     elif args.command == "update":

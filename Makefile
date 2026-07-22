@@ -28,6 +28,20 @@ run:
 		-v $(PWD)/validation_data:/app/validation_data \
 		-v $(PWD)/data-vlaanderen-scraper-output:/app/data-vlaanderen-scraper-output \
 		-e TZ=Europe/Brussels \
+		-e QLEVER_ACCESS_TOKEN=$(QLEVER_ACCESS_TOKEN) \
+		$(APP_IMAGE):$(VERSION)
+
+run-dumps:
+	docker run -d --name $(APP_IMAGE) \
+		--restart unless-stopped \
+		-p 8000:8000 -p 8888:8888 \
+		-v $(PWD)/qlever:/app/qlever \
+		-v $(PWD)/logs:/app/logs \
+		-v $(PWD)/validation_data:/app/validation_data \
+		-v $(PWD)/data-vlaanderen-scraper-output:/app/data-vlaanderen-scraper-output \
+		-e TZ=Europe/Brussels \
+		-e QLEVER_ACCESS_TOKEN=$(QLEVER_ACCESS_TOKEN) \
+		-e WITH_DUMPS=1 \
 		$(APP_IMAGE):$(VERSION)
 
 stop:

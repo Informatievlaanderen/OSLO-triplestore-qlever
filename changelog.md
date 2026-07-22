@@ -6,3 +6,6 @@
 
 - 1.0.3
   Stream the http logs to the docker container
+
+  1.1.0
+  Add support for bedrijventerreinen so that the triplestore can be given information through a set of dumps

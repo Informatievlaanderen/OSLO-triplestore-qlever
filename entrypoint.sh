@@ -7,7 +7,13 @@ printenv | grep -v "no_proxy" >> /etc/environment
 service cron start
 
 # Execute initialization pipeline
-python3 main.py init
+# Set WITH_DUMPS=1 to skip the scraper and use N-Quads dump files only
+INIT_ARGS="init"
+if [ "${WITH_DUMPS:-0}" = "1" ]; then
+    INIT_ARGS="$INIT_ARGS --with-dumps"
+    echo "WITH_DUMPS=1: skipping scraper, using N-Quads dump files only"
+fi
+python3 main.py $INIT_ARGS
 
 # Stream QLever HTTP logs into container stdout so docker logs shows incoming SPARQL calls
 (

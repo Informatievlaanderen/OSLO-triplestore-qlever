@@ -1,0 +1,51 @@
+# Exclude QLever binary indexes (huge files, mounted at runtime)
+qlever/*.index.*
+qlever/*.vocabulary.*
+qlever/*.meta-data.json
+qlever/*.settings.json
+qlever/*.codebooks
+qlever/*.dat
+qlever/*.tmp.*
+qlever/*.txt
+qlever/*.log.txt
+
+# Exclude QLever data directory (containing .nt files and dumps/)
+qlever/data/
+
+# Exclude QLever archive
+qlever/archive/
+
+# Exclude previous indexes
+qlever/previous_qlever_indexes/
+
+# Exclude Qleverfile.local (generated at runtime)
+qlever/Qleverfile.local
+
+# Exclude Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Exclude logs
+logs/
+
+# Exclude scraped data
+data-vlaanderen-scraper-output/
+
+# Exclude cloned repository
+data.vlaanderen.be2-generated/
+
+# Exclude validation data
+validation_data/
+
+# Exclude environment files
+.env
+*.env
+
+# Exclude IDE files
+.vscode/
+.idea/
+
+# Exclude git
+.git/
+.gitignore

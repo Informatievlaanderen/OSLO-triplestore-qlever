@@ -1,83 +1,25 @@
 import shutil
 import logging
-import subprocess
-import sys
 from datetime import datetime
 from pathlib import Path
 
 from core.clean_data import clean_data
+from core.logger import setup_logger
+from core.nq_merge import convert_nq_dumps_to_individual_nt
+from core.qleverfile import prepare_local_qleverfile
 from core.utils import scrape_data, run_command
 
 
-def prepare_local_qleverfile(config, qlever_dir: Path) -> Path:
-    """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
-    project_root = Path(__file__).resolve().parents[1]
-    source_template = qlever_dir / "Qleverfile.template"
-    fallback_template = project_root / "templates" / "Qleverfile.template"
-    source_qleverfile = qlever_dir / "Qleverfile"
-    target = project_root / "Qleverfile.local"
+def _merge_nq_dumps_into_dataset(active_data_dir: Path, active_file: Path, single: bool = False) -> None:
+    """Backward-compatible wrapper — delegates to convert_nq_dumps_to_individual_nt.
 
-    if source_template.exists():
-        source = source_template
-    elif source_qleverfile.exists():
-        source = source_qleverfile
-    elif fallback_template.exists():
-        source = fallback_template
-    else:
-        source = None
-
-    if source is None:
-        raise FileNotFoundError(
-            f"Neither {source_template} nor {source_qleverfile} nor {fallback_template} exists. "
-            "At least one source Qleverfile is required."
-        )
-
-    token = str(config.qlever.access_token)
-    if not token or token.startswith("${"):
-        raise ValueError(
-            "qlever.access_token is not resolved. Load your environment (for example from .env) before running commands."
-        )
-
-    render_script = project_root / "scripts" / "render_qleverfile.py"
-    if not render_script.exists():
-        raise FileNotFoundError(f"Render script not found at {render_script}")
-
-    cmd = [
-        sys.executable,
-        str(render_script),
-        "--template",
-        str(source),
-        "--output",
-        str(target),
-        "--token",
-        token,
-    ]
-    try:
-        subprocess.run(cmd, cwd=project_root, check=True)
-    except subprocess.CalledProcessError as e:
-        logging.error("Failed to render local Qleverfile from template.")
-        raise RuntimeError("Unable to generate Qleverfile.local") from e
-
-    return target
+    The ``active_file`` argument is ignored; each .nq dump now becomes its own
+    .nt file instead of being merged into a single file.
+    """
+    convert_nq_dumps_to_individual_nt(active_data_dir, single=single)
 
 
-def setup_logger(log_dir: Path):
-    """Configures logging to output to both console and a file in the log directory."""
-    log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / "qlever_initialization.log"
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[
-            logging.FileHandler(log_file, encoding='utf-8'),
-            logging.StreamHandler()
-        ],
-        force=True
-    )
-
-
-def initialize_qlever_endpoint(config) -> None:
+def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bool = False) -> None:
     cwd = Path.cwd()
     date_str = datetime.now().date().isoformat()
 
@@ -105,29 +47,36 @@ def initialize_qlever_endpoint(config) -> None:
         archived_active = archive_dir / f"{dataset_name}.previous.nt"
         shutil.move(str(active_file), str(archived_active))
 
-    # Scrape new data
-    raw_scraped_file = scrape_data(config, output_dir)
+    if not with_dumps:
+        # Scrape new data
+        raw_scraped_file = scrape_data(config, output_dir)
 
-    # Archive the raw scrape (overwrites existing file)
-    logging.info("Archiving raw scraped data.")
-    archived_raw = archive_dir / f"{dataset_name}.raw.nt"
-    shutil.copy2(raw_scraped_file, archived_raw)
+        # Archive the raw scrape (overwrites existing file)
+        logging.info("Archiving raw scraped data.")
+        archived_raw = archive_dir / f"{dataset_name}.raw.nt"
+        shutil.copy2(raw_scraped_file, archived_raw)
 
-    # Clean data in the output directory (specifically ensure integers/strings have correct rdf datatype)
-    logging.info("Executing data cleaning routine.")
-    cleaned_output = output_dir / f"cleaned_{raw_scraped_file.name}"
+        # Clean data in the output directory (specifically ensure integers/strings have correct rdf datatype)
+        logging.info("Executing data cleaning routine.")
+        cleaned_output = output_dir / f"cleaned_{raw_scraped_file.name}"
 
-    clean_data(database_path=str(output_dir), database_file_name=raw_scraped_file.name)
+        clean_data(database_path=str(output_dir), database_file_name=raw_scraped_file.name)
 
-    # Move final cleaned data to the active QLever directory
-    if cleaned_output.exists():
-        logging.info("Transferring cleaned data to active datastore.")
-        shutil.move(str(cleaned_output), str(active_file))
+        # Move final cleaned data to the active QLever directory
+        if cleaned_output.exists():
+            logging.info("Transferring cleaned data to active datastore.")
+            shutil.move(str(cleaned_output), str(active_file))
+        else:
+            raise FileNotFoundError("Data cleaning failed to produce the expected output file.")
     else:
-        raise FileNotFoundError("Data cleaning failed to produce the expected output file.")
+        logging.info("--with-dumps: skipping scraper, using N-Quads dump files only.")
+
+    # Optionally convert all N-Quads dump files into individual .nt files
+    if with_dumps:
+        convert_nq_dumps_to_individual_nt(active_data_dir, single=single_dump)
 
     # Build indexes and start server
-    qleverfile_local = prepare_local_qleverfile(config, qlever_dir)
+    qleverfile_local = prepare_local_qleverfile(config, qlever_dir, active_data_dir)
     index_cmd = f"qlever --qleverfile {qleverfile_local} index --overwrite-existing"
 
     logging.info("Building QLever indexes.")
