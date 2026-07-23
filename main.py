@@ -37,16 +37,20 @@ def main():
 
     parser_init.add_argument(
         "--with-dumps",
-        action="store_true",
-        default=False,
-        help="Also include all quads from qlever/data/dumps/*.nq files during initialization.",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Path to a directory containing *.nq (N-Quads) dump files. "
+             "When provided, the scraper is skipped and QLever indexes "
+             "the .nq files directly using its native N-Quads parser.",
     )
 
     parser_init.add_argument(
         "--single-dump",
         action="store_true",
         default=False,
-        help="When used with --with-dumps, only convert the first .nq file (useful for testing).",
+        help="When used with --with-dumps, only index the first .nq file "
+             "(useful for testing).",
     )
 
     parser_restart = subparsers.add_parser(
@@ -67,7 +71,7 @@ def main():
     config = load_config(args.config)
 
     if args.command == "init":
-        initialize_qlever_endpoint(config, with_dumps=args.with_dumps, single_dump=args.single_dump)
+        initialize_qlever_endpoint(config, dumps_dir=args.with_dumps, single_dump=args.single_dump)
     elif args.command == "restart":
         restart_qlever_endpoint(config)
     elif args.command == "update":

@@ -39,9 +39,10 @@ run-dumps:
 		-v $(PWD)/logs:/app/logs \
 		-v $(PWD)/validation_data:/app/validation_data \
 		-v $(PWD)/data-vlaanderen-scraper-output:/app/data-vlaanderen-scraper-output \
+		-v $(DUMPS_DIR):/app/dumps:ro \
 		-e TZ=Europe/Brussels \
 		-e QLEVER_ACCESS_TOKEN=$(QLEVER_ACCESS_TOKEN) \
-		-e WITH_DUMPS=1 \
+		-e DUMPS_DIR=/app/dumps \
 		$(APP_IMAGE):$(VERSION)
 
 stop:

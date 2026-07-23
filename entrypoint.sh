@@ -7,11 +7,11 @@ printenv | grep -v "no_proxy" >> /etc/environment
 service cron start
 
 # Execute initialization pipeline
-# Set WITH_DUMPS=1 to skip the scraper and use N-Quads dump files only
+# Set DUMPS_DIR=/path/to/nq/files to skip the scraper and index N-Quads dump files directly
 INIT_ARGS="init"
-if [ "${WITH_DUMPS:-0}" = "1" ]; then
-    INIT_ARGS="$INIT_ARGS --with-dumps"
-    echo "WITH_DUMPS=1: skipping scraper, using N-Quads dump files only"
+if [ -n "${DUMPS_DIR:-}" ]; then
+    INIT_ARGS="$INIT_ARGS --with-dumps $DUMPS_DIR"
+    echo "DUMPS_DIR=$DUMPS_DIR: skipping scraper, indexing N-Quads dump files directly"
 fi
 python3 main.py $INIT_ARGS
 

@@ -1,3 +1,4 @@
+import os
 import shutil
 import logging
 from datetime import datetime
@@ -9,7 +10,17 @@ from core.qleverfile import prepare_local_qleverfile
 from core.utils import scrape_data, run_command
 
 
-def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bool = False) -> None:
+def initialize_qlever_endpoint(config, dumps_dir: Path | None = None, single_dump: bool = False) -> None:
+    """Initialize the QLever endpoint from scratch.
+
+    Args:
+        config: The application configuration.
+        dumps_dir: Optional path to a directory of ``*.nq`` (N-Quads) dump files.
+                   When provided, the scraper is skipped and QLever indexes the
+                   ``.nq`` files directly using its native N-Quads parser.
+        single_dump: When ``True``, only the first ``.nq`` file is indexed
+                     (useful for testing).
+    """
     cwd = Path.cwd()
     date_str = datetime.now().date().isoformat()
 
@@ -20,7 +31,6 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
     # Define streamlined paths
     qlever_dir = cwd / config.qlever.store_dir
     active_data_dir = qlever_dir / "data"
-    dumps_dir = active_data_dir / "dumps"
     archive_dir = qlever_dir / "archive"
     output_dir = cwd / config.scraper.scraper_output_dir
 
@@ -32,7 +42,7 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
     archive_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if not with_dumps:
+    if dumps_dir is None:
         # Archive the previous active dataset (overwrites existing file)
         if active_file.exists():
             logging.info("Archiving previous active data.")
@@ -65,20 +75,35 @@ def initialize_qlever_endpoint(config, with_dumps: bool = False, single_dump: bo
         rdf_format = "nt"
         input_glob = "data/*.nt"
     else:
-        logging.info("--with-dumps: skipping scraper, using N-Quads dump files directly.")
+        dumps_dir = dumps_dir.resolve()
+        if not dumps_dir.exists() or not dumps_dir.is_dir():
+            raise FileNotFoundError(f"Dumps directory not found: {dumps_dir}")
+
+        nq_files = sorted(dumps_dir.glob("*.nq"))
+        if not nq_files:
+            raise FileNotFoundError(f"No .nq files found in: {dumps_dir}")
+
+        logging.info(
+            "--with-dumps: skipping scraper, using %d N-Quads dump file(s) from %s.",
+            len(nq_files), dumps_dir,
+        )
 
         if single_dump:
-            nq_files = sorted(dumps_dir.glob("*.nq"))
-            if nq_files:
-                logging.info(f"--single-dump: using only {nq_files[0].name}")
-            else:
-                logging.warning("--single-dump: no .nq files found in dumps directory.")
+            nq_files = nq_files[:1]
+            logging.info("--single-dump: using only %s", nq_files[0].name)
 
         # Point QLever directly at the .nq dump files — no conversion needed.
         # QLever natively supports N-Quads (.nq) format.
         qlever_data_dir = dumps_dir
         rdf_format = "nq"
-        input_glob = "data/dumps/*.nq"
+
+        # Compute the INPUT_FILES glob relative to qlever_dir (where the index
+        # command runs).  qlever-control requires a relative glob pattern.
+        try:
+            rel_dumps = dumps_dir.relative_to(qlever_dir)
+        except ValueError:
+            rel_dumps = Path(os.path.relpath(dumps_dir, qlever_dir))
+        input_glob = str(rel_dumps / "*.nq")
 
     # Build indexes and start server
     qleverfile_local = prepare_local_qleverfile(
