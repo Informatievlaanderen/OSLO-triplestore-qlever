@@ -13,8 +13,15 @@ def prepare_local_qleverfile(
     base_dir: Path | None = None,
     rdf_format: str = "nt",
     input_glob: str = "data/*.nt",
+    extra_files: list[Path] | None = None,
 ) -> Path:
-    """Create a local Qleverfile with a concrete ACCESS_TOKEN value."""
+    """Create a local Qleverfile with a concrete ACCESS_TOKEN value.
+
+    Args:
+        extra_files: Optional list of additional RDF files (e.g. downloaded
+                     codelists) to include in MULTI_INPUT_JSON. Each file gets
+                     its own named graph derived from its stem.
+    """
     project_root = Path(__file__).resolve().parents[1]
     source_template = qlever_dir / "Qleverfile.template"
     fallback_template = project_root / "templates" / "Qleverfile.template"
@@ -64,6 +71,9 @@ def prepare_local_qleverfile(
         cmd.extend(["--data-dir", str(data_dir)])
     if base_dir is not None:
         cmd.extend(["--base-dir", str(base_dir)])
+    if extra_files:
+        for ef in extra_files:
+            cmd.extend(["--extra-file", str(ef)])
     try:
         subprocess.run(cmd, cwd=project_root, check=True)
     except subprocess.CalledProcessError as e:

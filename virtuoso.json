@@ -1,0 +1,219 @@
+{
+    "head": {
+        "link": [],
+        "vars": [
+            "property",
+            "value"
+        ]
+    },
+    "results": {
+        "distinct": false,
+        "ordered": true,
+        "bindings": [
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#Bedrijventerrein"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#Bedrijventerrein"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://mu.semte.ch/vocabularies/core/uuid"
+                },
+                "value": {
+                    "type": "literal",
+                    "value": "bedrijventerrein-31"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://mu.semte.ch/vocabularies/core/uuid"
+                },
+                "value": {
+                    "type": "literal",
+                    "value": "bedrijventerrein-31"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/2004/02/skos/core#prefLabel"
+                },
+                "value": {
+                    "type": "literal",
+                    "xml:lang": "nl",
+                    "value": "Eksterveldlaan"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/2004/02/skos/core#prefLabel"
+                },
+                "value": {
+                    "type": "literal",
+                    "xml:lang": "nl",
+                    "value": "Eksterveldlaan"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#beschikbareKavels"
+                },
+                "value": {
+                    "type": "typed-literal",
+                    "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+                    "value": "0"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#beschikbareKavels"
+                },
+                "value": {
+                    "type": "typed-literal",
+                    "datatype": "http://www.w3.org/2001/XMLSchema#boolean",
+                    "value": "0"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#oppervlakte"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/oppervlakte/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#oppervlakte"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/oppervlakte/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#beschikbareOppervlakte"
+                },
+                "value": {
+                    "type": "bnode",
+                    "value": "nodeID://b8766877858"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/bedrijventerrein#beschikbareOppervlakte"
+                },
+                "value": {
+                    "type": "bnode",
+                    "value": "nodeID://b9200653211"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://data.vlaanderen.be/ns/perceel#geometrie"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/geometrie/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://data.vlaanderen.be/ns/perceel#geometrie"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/geometrie/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/ns/adms#identifier"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/identifier/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "http://www.w3.org/ns/adms#identifier"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://bedrijventerrein.vlaanderen.be/doc/.well-known/genid/identifier/b9f2b35abfa20d1431152e0fe48252d56f17a35904dfbec453a7cdc654795519"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#RuimtelijkeEenheid.type"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/id/concept/RuimtelijkeEenheidtype/bedrijventerrein"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#RuimtelijkeEenheid.type"
+                },
+                "value": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/id/concept/RuimtelijkeEenheidtype/bedrijventerrein"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#geldigheidsperiode"
+                },
+                "value": {
+                    "type": "bnode",
+                    "value": "nodeID://b8766877859"
+                }
+            },
+            {
+                "property": {
+                    "type": "uri",
+                    "value": "https://data.vlaanderen.be/ns/perceel#geldigheidsperiode"
+                },
+                "value": {
+                    "type": "bnode",
+                    "value": "nodeID://b9200653212"
+                }
+            }
+        ]
+    }
+}

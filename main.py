@@ -53,6 +53,17 @@ def main():
              "(useful for testing).",
     )
 
+    parser_init.add_argument(
+        "--codelists-dataset",
+        type=str,
+        default=None,
+        metavar="URL",
+        help="URL to a dataset.json file (e.g. from data.vlaanderen.be2) "
+             "containing a 'conceptSchemes' list. Each entry's sourceUrl "
+             "is downloaded as a .ttl file and indexed into its own named "
+             "graph alongside the main data.",
+    )
+
     parser_restart = subparsers.add_parser(
         "restart", help="Restart the endpoint from a previous state."
     )
@@ -71,7 +82,12 @@ def main():
     config = load_config(args.config)
 
     if args.command == "init":
-        initialize_qlever_endpoint(config, dumps_dir=args.with_dumps, single_dump=args.single_dump)
+        initialize_qlever_endpoint(
+            config,
+            dumps_dir=args.with_dumps,
+            single_dump=args.single_dump,
+            codelists_dataset_url=args.codelists_dataset,
+        )
     elif args.command == "restart":
         restart_qlever_endpoint(config)
     elif args.command == "update":

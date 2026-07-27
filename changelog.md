@@ -20,3 +20,9 @@
   Also removed the regex-based N-Quads→N-Triples conversion step. QLever
   natively supports `.nq` (N-Quads) files, so the `.nq` files are now indexed
   directly without any intermediate conversion or deduplication.
+
+- 1.3.0
+  Added an extra env variable `CODELISTS_DATASET_URL` to import skos:Concept codelists urls from data.vlaanderen.be2.
+
+- 1.3.1
+  Added some more catch behaviour on the scraper so that the store doesn't stop when requests fail to github.

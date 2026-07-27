@@ -3,6 +3,7 @@ import time
 import urllib.request
 import urllib.parse
 import urllib.error
+import fcntl
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
@@ -205,6 +206,17 @@ def execute_update_pipeline(config) -> None:
 
     output_dir.mkdir(parents=True, exist_ok=True)
     setup_logger(log_dir)
+
+    # Acquire a file lock to prevent overlapping pipeline runs (e.g. from cron)
+    lock_path = cwd / ".update-pipeline.lock"
+    lock_file = open(lock_path, "w")
+    try:
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        logging.warning("Update pipeline is already running. Exiting.")
+        lock_file.close()
+        return
+
     logging.info("Initializing update pipeline.")
 
     previous_output = output_dir / config.files.previous

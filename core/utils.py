@@ -1,6 +1,7 @@
 import shutil
 import sys
 import subprocess
+import time
 from pathlib import Path
 import logging
 
@@ -77,11 +78,29 @@ def scrape_data(config, output_dir: Path) -> Path:
     scraper_dir = cwd / config.scraper.scraper_dir
 
     if repo_path.exists():
-        shutil.rmtree(repo_path, ignore_errors=True)
+        shutil.rmtree(repo_path)
 
-    run_command(
-        f"git clone -b {config.repository.branch} --depth 1 {config.repository.url} {repo_path}"
-    )
+    # Retry git clone up to 3 times with exponential backoff for transient errors
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            run_command(
+                f"git clone -b {config.repository.branch} --depth 1 {config.repository.url} {repo_path}"
+            )
+            break
+        except SystemExit:
+            if attempt < max_retries:
+                wait = 2 ** attempt
+                logging.warning(
+                    "git clone failed (attempt %d/%d), retrying in %ds...",
+                    attempt, max_retries, wait,
+                )
+                time.sleep(wait)
+                # Clean up any partial clone before retrying
+                if repo_path.exists():
+                    shutil.rmtree(repo_path)
+            else:
+                raise
     run_command("npm i", cwd=scraper_dir)
     run_command("npm start", cwd=scraper_dir)
 

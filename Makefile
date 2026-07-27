@@ -45,6 +45,20 @@ run-dumps:
 		-e DUMPS_DIR=/app/dumps \
 		$(APP_IMAGE):$(VERSION)
 
+run-codelists:
+	docker run -d --name $(APP_IMAGE) \
+		--restart unless-stopped \
+		-p 8000:8000 -p 8888:8888 \
+		-v $(PWD)/qlever:/app/qlever \
+		-v $(PWD)/logs:/app/logs \
+		-v $(PWD)/validation_data:/app/validation_data \
+		-v $(PWD)/data-vlaanderen-scraper-output:/app/data-vlaanderen-scraper-output \
+		-v $(DUMPS_DIR):/app/dumps:ro \
+		-e TZ=Europe/Brussels \
+		-e QLEVER_ACCESS_TOKEN=$(QLEVER_ACCESS_TOKEN) \
+		-e CODELISTS_DATASET_URL="https://raw.githubusercontent.com/Informatievlaanderen/data.vlaanderen.be2/production/config/dataset.json" \
+		$(APP_IMAGE):$(VERSION)
+
 stop:
 	docker stop $(APP_IMAGE) && docker rm $(APP_IMAGE)
 

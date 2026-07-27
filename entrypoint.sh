@@ -8,10 +8,15 @@ service cron start
 
 # Execute initialization pipeline
 # Set DUMPS_DIR=/path/to/nq/files to skip the scraper and index N-Quads dump files directly
+# Set CODELISTS_DATASET_URL to a dataset.json URL to download and index codelist .ttl files
 INIT_ARGS="init"
 if [ -n "${DUMPS_DIR:-}" ]; then
     INIT_ARGS="$INIT_ARGS --with-dumps $DUMPS_DIR"
     echo "DUMPS_DIR=$DUMPS_DIR: skipping scraper, indexing N-Quads dump files directly"
+fi
+if [ -n "${CODELISTS_DATASET_URL:-}" ]; then
+    INIT_ARGS="$INIT_ARGS --codelists-dataset $CODELISTS_DATASET_URL"
+    echo "CODELISTS_DATASET_URL=$CODELISTS_DATASET_URL: downloading codelists from dataset.json"
 fi
 python3 main.py $INIT_ARGS
 
