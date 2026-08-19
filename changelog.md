@@ -26,3 +26,7 @@
 
 - 1.3.1
   Added some more catch behaviour on the scraper so that the store doesn't stop when requests fail to github.
+
+- 1.3.2
+
+Added extra flag OPENBLAS_NUM_THREADS to work with docker version 19.x

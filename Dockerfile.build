@@ -3,6 +3,7 @@ FROM qlever-triple-store-base:${VERSION}
 
 WORKDIR /app
 ENV PYTHONPATH="/app"
+ENV OPENBLAS_NUM_THREADS=1
 
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
